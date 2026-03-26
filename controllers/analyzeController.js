@@ -1,6 +1,7 @@
 import { cloneRepo } from "../services/repoService.js";
 import { scanFiles } from "../services/scanService.js";
 import { analyzeComplexity } from "../services/complexityService.js";
+import { generateInsights } from "../services/insightService.js";
 import { deleteRepo } from "../services/deleteService.js";
 
 
@@ -21,19 +22,28 @@ const analyzeRepo = async (req, res) => {
     const files = scanFiles(repoPath);
 
     //Analyze Complexity
-    const results = files.map((file) => analyzeComplexity(file));
+    const rawResults = files.map((file) => analyzeComplexity(file));
+
+    const cleanedResults = rawResults.map(result=>({
+      ...result,
+      file:result.file.replace(repoPath,"").replace(/^[\\\/]+/,"").replace(/\\/g,"/")
+    }))
+
+    const insights = generateInsights(cleanedResults);
 
     res.json({
         status: "success", 
         totalFiles: files.length,
-        files: files.slice(0, 10),
-        analysis: results.slice(0,5)
+        averageComplexity: insights.averageComplexity,
+        mostComplexFile: insights.mostComplexFile,
+        topComplexFiles: insights.topComplexFiles
      });
 
   } catch (error) {
+    console.error("Error analyzing repo:", error);
     return res.status(500).json({ 
       success:'false',
-      message: "Server error" 
+      message: "Server error during analysis" 
     });
   } finally {
     console.log('Cleaning up...');
