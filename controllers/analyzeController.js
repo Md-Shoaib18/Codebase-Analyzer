@@ -1,9 +1,12 @@
 import { cloneRepo } from "../services/repoService.js";
 import { scanFiles } from "../services/scanService.js";
 import { analyzeComplexity } from "../services/complexityService.js";
+import { deleteRepo } from "../services/deleteService.js";
 
 
 const analyzeRepo = async (req, res) => {
+  let repoPath = null;
+
   try {
     const { repoUrl } = req.body;
 
@@ -12,7 +15,7 @@ const analyzeRepo = async (req, res) => {
     }
 
     //Clone
-    const repoPath = await cloneRepo(repoUrl);
+   repoPath = await cloneRepo(repoUrl);
 
     //Scan
     const files = scanFiles(repoPath);
@@ -28,7 +31,16 @@ const analyzeRepo = async (req, res) => {
      });
 
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ 
+      success:'false',
+      message: "Server error" 
+    });
+  } finally {
+    console.log('Cleaning up...');
+    if(repoPath){
+      deleteRepo(repoPath);
+      console.log(`Successfully deleted repo at ${repoPath}`);
+    }
   }
 };
 
