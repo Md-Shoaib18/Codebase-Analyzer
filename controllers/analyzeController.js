@@ -34,6 +34,11 @@ const analyzeRepo = async (req, res) => {
     res.json({
         status: "success", 
         totalFiles: files.length,
+        // files : rawResults.map(result=>({
+        //   ...result,
+        //   file:result.file.replace(repoPath,"").replace(/^[\\\/]+/,"").replace(/\\/g,"/")
+        // })),
+        analysis:cleanedResults.slice(0,10),
         averageComplexity: insights.averageComplexity,
         mostComplexFile: insights.mostComplexFile,
         topComplexFiles: insights.topComplexFiles
@@ -45,13 +50,14 @@ const analyzeRepo = async (req, res) => {
       success:'false',
       message: "Server error during analysis" 
     });
-  } finally {
-    console.log('Cleaning up...');
-    if(repoPath){
-      deleteRepo(repoPath);
-      console.log(`Successfully deleted repo at ${repoPath}`);
-    }
-  }
+  } 
+  // finally {
+  //   console.log('Cleaning up...');
+  //   if(repoPath){
+  //     deleteRepo(repoPath);
+  //     console.log(`Successfully deleted repo at ${repoPath}`);
+  //   }
+  // }
 };
 
 export {
