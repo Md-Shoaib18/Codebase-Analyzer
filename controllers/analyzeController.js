@@ -3,7 +3,8 @@ import { scanFiles } from "../services/scanService.js";
 import { analyzeComplexity } from "../services/complexityService.js";
 import { generateInsights } from "../services/insightService.js";
 import { detectDuplicates } from "../services/duplicateService.js";
-import { analyzeDependencies } from "../services/dependencyService.js"; 
+import { analyzeDependencies } from "../services/dependencyService.js";
+import { scanForSecrets } from "../services/securityService.js"; 
 import Analysis from "../models/analysisModel.js";
 
 const analyzeRepo = async (req, res) => {
@@ -44,13 +45,20 @@ const analyzeRepo = async (req, res) => {
         }))
     }));
 
+    const rawSecrets = scanForSecrets(files);
+    const cleanedSecrets = rawSecrets.map(secret => ({
+            ...secret,
+            file: secret.file.replace(repoPath, "").replace(/^[\\\/]+/, "").replace(/\\/g, "/")
+        }));
+
     const newAnalysis = await Analysis.create({
             user: req.user.id, // Comes from your JWT auth middleware
             repoUrl: repoUrl,
             totalFiles: files.length,
             averageComplexity: insights.averageComplexity,
             mostComplexFile: insights.mostComplexFile,
-            duplicateInstances: cleanedDuplicates.length
+            duplicateInstances: cleanedDuplicates.length,
+            securityIssues: cleanedSecrets.length
         });
 
     // 3. Add to Final Response
@@ -59,6 +67,7 @@ const analyzeRepo = async (req, res) => {
         analysisId:newAnalysis._id,
         projectSetup: dependencyInfo, // <-- Added here
         totalFiles: files.length,
+        security: cleanedSecrets,
         analysis: cleanedResults.slice(0, 10),
         averageComplexity: insights.averageComplexity,
         mostComplexFile: insights.mostComplexFile,

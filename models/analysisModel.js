@@ -10,7 +10,8 @@ const analysisSchema = new mongoose.Schema({
         file: String,
         score: Number
     },
-    duplicateInstances: { type: Number, default: 0 } 
+    duplicateInstances: { type: Number, default: 0 },
+    securityIssues: {type:Number,default:0}
 }, { timestamps: true }); 
 
 export default mongoose.model('Analysis', analysisSchema);
