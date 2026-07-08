@@ -3,7 +3,8 @@ import { scanFiles } from "../services/scanService.js";
 import { analyzeComplexity } from "../services/complexityService.js";
 import { generateInsights } from "../services/insightService.js";
 import { detectDuplicates } from "../services/duplicateService.js";
-import { analyzeDependencies } from "../services/dependencyService.js"; // 1. Import it
+import { analyzeDependencies } from "../services/dependencyService.js"; 
+import Analysis from "../models/analysisModel.js";
 
 const analyzeRepo = async (req, res) => {
   let repoPath = null;
@@ -43,9 +44,19 @@ const analyzeRepo = async (req, res) => {
         }))
     }));
 
+    const newAnalysis = await Analysis.create({
+            user: req.user.id, // Comes from your JWT auth middleware
+            repoUrl: repoUrl,
+            totalFiles: files.length,
+            averageComplexity: insights.averageComplexity,
+            mostComplexFile: insights.mostComplexFile,
+            duplicateInstances: cleanedDuplicates.length
+        });
+
     // 3. Add to Final Response
     res.json({
         status: "success", 
+        analysisId:newAnalysis._id,
         projectSetup: dependencyInfo, // <-- Added here
         totalFiles: files.length,
         analysis: cleanedResults.slice(0, 10),
@@ -64,4 +75,20 @@ const analyzeRepo = async (req, res) => {
   } 
 };
 
-export { analyzeRepo };
+const getUserHistory = async (req, res) => {
+    try {
+        // Find all analyses belonging to this user, sort by newest first
+        const history = await Analysis.find({ user: req.user.id }).sort({ createdAt: -1 });
+        
+        res.json({
+            status: "success",
+            count: history.length,
+            data: history
+        });
+    } catch (error) {
+        console.error("Error fetching history:", error);
+        res.status(500).json({ message: "Failed to fetch user history" });
+    }
+};
+
+export { analyzeRepo, getUserHistory };
