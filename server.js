@@ -6,7 +6,6 @@ import userRoutes from './routes/userRoutes.js';
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
-const API_KEY = "ak_1234567890abcdef1234567890abcdef";
 
 app.use(express.json());
 
