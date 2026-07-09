@@ -126,7 +126,7 @@ const Dashboard = () => {
                                             </p>
                                             <button 
                                                 onClick={(e) => handleDelete(e, item._id)}
-                                                className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 absolute right-3 top-3 flex-shrink-0"
+                                                className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 absolute right-3 top-3 shrink-0"
                                                 title="Delete Report"
                                             >
                                                 <Trash2 className="w-4 h-4" />

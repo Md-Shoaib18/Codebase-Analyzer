@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Tailwind Blue-600 Rounded Background -->
+  <rect width="512" height="512" rx="120" fill="#2563EB"/>
+  
+  <!-- Left Bracket -->
+  <path d="M192 160L80 256L192 352" stroke="#ffffff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Right Bracket -->
+  <path d="M320 160L432 256L320 352" stroke="#ffffff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Center Slash -->
+  <path d="M304 96L208 416" stroke="#ffffff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
