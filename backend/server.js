@@ -1,15 +1,25 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import analyzeRoute from './routes/analyzeRoute.js';
 import { connectDB } from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
+import {startWorker} from './workers/analysisWorker.js';
 dotenv.config();
+
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:5173', // Adjust
+  credentials: true, // Allow cookies to be sent
+}));
 
 connectDB();
+
+startWorker();
 
 app.get('/', (req, res) => {
   res.send('Codebase Analyzer API is running.');
