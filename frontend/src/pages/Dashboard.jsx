@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react';
 import API from '../api/axiosConfig';
 import Navbar from '../components/Navbar';
-import { Search, GitBranch, Clock, Activity, CheckCircle } from 'lucide-react';
-import ReportView from '../components/ReportView'; // Add this line
+import { Search, GitBranch, Clock, Activity, CheckCircle, Trash2 } from 'lucide-react';
+import ReportView from '../components/ReportView';
 
 const Dashboard = () => {
     const [repoUrl, setRepoUrl] = useState('');
@@ -71,6 +71,28 @@ const Dashboard = () => {
         }
     };
 
+    const handleDelete = async (e, id) => {
+        e.stopPropagation(); // Prevents the click from opening the report
+        
+        // Quick native browser confirmation
+        if (window.confirm("Are you sure you want to delete this report?")) {
+            try {
+                await API.delete(`/analyze/${id}`);
+                
+                // Remove it from the sidebar visually without reloading the page
+                setHistory(history.filter(item => item._id !== id));
+                
+                // If they just deleted the report they are currently looking at, close it
+                if (selectedAnalysis?._id === id) {
+                    setSelectedAnalysis(null);
+                }
+            } catch (error) {
+                console.error("Failed to delete report", error);
+                alert("Failed to delete the report.");
+            }
+        }
+    };
+    
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
@@ -91,20 +113,29 @@ const Dashboard = () => {
                                 history.map((item) => (
                                     <div 
                                         key={item._id} 
-                                        onClick={() => setSelectedAnalysis(item)} // <-- ADDED THIS
-                                        className={`p-3 border rounded-lg cursor-pointer transition-colors group ${
+                                        onClick={() => setSelectedAnalysis(item)} 
+                                        className={`p-3 border rounded-lg cursor-pointer transition-colors group relative ${
                                             selectedAnalysis?._id === item._id 
                                             ? 'bg-blue-50 border-blue-200' 
                                             : 'border-gray-100 hover:bg-gray-50'
                                         }`}
                                     >
-                                        <p className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600">
-                                            {item.repoUrl.replace('https://github.com/', '')}
-                                        </p>
+                                        <div className="flex justify-between items-start">
+                                            <p className="text-sm font-medium text-gray-900 truncate pr-6 group-hover:text-blue-600">
+                                                {item.repoUrl.replace('https://github.com/', '')}
+                                            </p>
+                                            <button 
+                                                onClick={(e) => handleDelete(e, item._id)}
+                                                className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 absolute right-3 top-3 flex-shrink-0"
+                                                title="Delete Report"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                         <div className="flex justify-between mt-2 text-xs text-gray-500">
                                             <span>Files: {item.totalFiles}</span>
-                                            <span className={item.securityIssues > 0 ? "text-red-500 font-medium" : "text-green-500"}>
-                                                Issues: {item.securityIssues}
+                                            <span className={item.securityIssues?.length > 0 || item.securityIssues > 0 ? "text-red-500 font-medium" : "text-green-500"}>
+                                                Issues: {Array.isArray(item.securityIssues) ? item.securityIssues.length : (item.securityIssues || 0)}
                                             </span>
                                         </div>
                                     </div>
@@ -116,8 +147,8 @@ const Dashboard = () => {
 
                 {/* MAIN CONTENT AREA */}
                 <div className="w-2/3 flex flex-col space-y-6">
-                    {/* CONDITIONAL RENDERING: Show Report if selected, otherwise show Search */
-                    selectedAnalysis ? (
+                    {/* CONDITIONAL RENDERING: Show Report if selected, otherwise show Search */}
+                    {selectedAnalysis ? (
                         <ReportView 
                             analysis={selectedAnalysis} 
                             onBack={() => setSelectedAnalysis(null)} 

@@ -1,4 +1,4 @@
-// models/analysisModel.js
+// backend/models/analysisModel.js
 import mongoose from 'mongoose';
 
 const analysisSchema = new mongoose.Schema({
@@ -6,12 +6,15 @@ const analysisSchema = new mongoose.Schema({
     repoUrl: { type: String, required: true },
     totalFiles: { type: Number, required: true },
     averageComplexity: { type: Number, required: true },
-    mostComplexFile: {
-        file: String,
-        score: Number
-    },
-    duplicateInstances: { type: Number, default: 0 },
-    securityIssues: {type:Number,default:0}
-}, { timestamps: true }); 
+    mostComplexFile: { file: String, score: Number },
+    topComplexFiles: { type: Array, default: [] },
+    duplicates: { type: Array, default: [] },
+    securityIssues: { type: Array, default: [] },
+    
+    // NEW: Add these two so Mongoose allows them to be saved!
+    projectSetup: { type: Object, default: {} },
+    analysis: { type: Array, default: [] }
+    
+}, { timestamps: true });
 
 export default mongoose.model('Analysis', analysisSchema);

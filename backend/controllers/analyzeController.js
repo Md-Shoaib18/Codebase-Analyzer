@@ -73,3 +73,26 @@ export const getUserHistory = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch user history" });
     }
 };
+
+export const deleteAnalysis = async (req, res) => {
+    try {
+        const analysis = await Analysis.findById(req.params.id);
+
+        if (!analysis) {
+            return res.status(404).json({ message: 'Analysis not found' });
+        }
+
+        // Security Check: Make sure the logged-in user owns this data
+        if (analysis.user.toString() !== req.user.id) {
+            return res.status(401).json({ message: 'Not authorized to delete this report' });
+        }
+
+        // Delete it from MongoDB
+        await analysis.deleteOne();
+        
+        res.status(200).json({ id: req.params.id, message: 'Analysis deleted successfully' });
+    } catch (error) {
+        console.error("Error deleting analysis:", error);
+        res.status(500).json({ message: 'Server error during deletion' });
+    }
+};

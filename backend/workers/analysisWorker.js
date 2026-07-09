@@ -53,10 +53,15 @@ export const startWorker = () => {
           user: userId,
           repoUrl: repoUrl,
           totalFiles: files.length,
-          averageComplexity: insights.averageComplexity,
-          mostComplexFile: insights.mostComplexFile,
-          duplicateInstances: cleanedDuplicates.length,
-          securityIssues: cleanedSecrets.length
+          averageComplexity: insights.averageComplexity || 0,
+          mostComplexFile: insights.mostComplexFile || { file: 'None', score: 0 },
+          topComplexFiles: insights.topComplexFiles || [],
+          duplicates: cleanedDuplicates || [],
+          securityIssues: cleanedSecrets || [],
+          
+          // NEW: Save the project dependencies and the raw analysis array
+          projectSetup: dependencyInfo || {},
+          analysis: cleanedResults.slice(0, 10) || []
       });
 
       console.log(`[Worker] Completed job ${job.id}`);
