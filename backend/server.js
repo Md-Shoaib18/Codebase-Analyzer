@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors({
-  origin: [ 'https://codebase-analyzer-five.vercel.app/', 'http://localhost:5173'  ],
+  origin: [ 'https://codebase-analyzer-five.vercel.app', 'http://localhost:5173'  ],
   credentials: true, // Allow cookies to be sent
 }));
 
