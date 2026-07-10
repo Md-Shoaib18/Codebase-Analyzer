@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard'; 
 import Register from './pages/Register';
 
+//console.log('VITE_API_URL:', import.meta.env.VITE_API_URL); // Log the API URL to verify it's being read correctly
+
 const PrivateRoute = ({ children }) => {
     const { user } = useContext(AuthContext);
     return user ? children : <Navigate to="/login" />;
