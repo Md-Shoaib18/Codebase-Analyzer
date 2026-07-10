@@ -1,5 +1,6 @@
 // workers/analysisWorker.js
 import { Worker } from 'bullmq';
+import Redis from 'ioredis';
 import Analysis from '../models/analysisModel.js';
 import { cloneRepo } from '../services/repoService.js';
 import { analyzeDependencies } from '../services/dependencyService.js';
@@ -8,11 +9,20 @@ import { analyzeComplexity } from '../services/complexityService.js';
 import { generateInsights } from '../services/insightService.js';
 import { detectDuplicates } from '../services/duplicateService.js';
 import { scanForSecrets } from '../services/securityService.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const connection = {
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: process.env.REDIS_PORT || 6379,
-};
+
+// console.log("redis url:", process.env.REDIS_URL);
+// const connection = {
+//   host: process.env.REDIS_HOST,
+//   port: process.env.REDIS_PORT,
+//   password: process.env.REDIS_PASSWORD,
+//   tls: {}
+// };
+const connection = new Redis(process.env.REDIS_URL, {
+  maxRetriesPerRequest: null,
+});
 
 export const startWorker = () => {
   const worker = new Worker('repo-analysis', async (job) => {

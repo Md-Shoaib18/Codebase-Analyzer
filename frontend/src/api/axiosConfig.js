@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create a custom axios instance pointing to your backend
 const API = axios.create({
-    baseURL: 'http://localhost:5000/api', // Adjust the port if your backend uses a different one
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
 
 // This "interceptor" runs right before every request is sent
