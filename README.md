@@ -106,9 +106,3 @@ npm run dev
 ## 🔒 Security Note
 
 This tool downloads and parses third-party code. Temporary repository files are stored locally during analysis and are automatically cleaned up after the worker finishes. Do not run this on untrusted infrastructure without proper sandboxing.
-
----
-
-## 👨‍💻 Author
-
-Built by [Your Name] - [Your LinkedIn Profile URL]
